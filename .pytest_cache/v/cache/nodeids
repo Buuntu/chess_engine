@@ -1,0 +1,4 @@
+[
+  "test_api.py::test_new_game",
+  "test_api.py::test_move"
+]
