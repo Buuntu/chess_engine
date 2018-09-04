@@ -1,5 +1,6 @@
 from flask import Flask, render_template, jsonify, request
 import chess
+import engine
 import random
 import json
 
@@ -18,25 +19,22 @@ def new_game():
 def random_move():
     print(request.data)
     json_post = request.get_json(force=True)
-    # json_post = json.loads(request.data)
     if ("board" in json_post):
-        board = chess.Board(json_post['board'])
-        # board.turn = False
-        legal_moves = board.legal_moves
-        random_int = random.randint(0,legal_moves.count()-1)
-        possible_moves = []
-        for move in legal_moves:
-            possible_moves.append(move)
-
-        print(legal_moves)
-        
-        print(possible_moves[random_int])
-        move = possible_moves[random_int]
-        #move = chess.Move.from_uci(possible_moves[random_int])
-        board.push_uci(move.uci())
+        board = engine.Minmax(json_post['board'])
+        board.random_move()
     else:
         board = chess.Board()
-    return jsonify({'board': str(board.fen())})
+    return jsonify({'board': str(board.get_fen())})
+
+@app.route('/best_random_move', methods = ['POST'])
+def best_random_move():
+    json_post = request.get_json(force = True)
+    if ("board" in json_post):
+        board = engine.Minmax(json_post['board'])
+        uci_move = board.calculate_best_move()
+        board.move(uci_move)
+
+    return jsonify({'board': str(board.get_fen())})
 
 if __name__ == '__main__':
     app.run(debug=True)
