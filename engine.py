@@ -31,6 +31,9 @@ class Minmax(object):
     def get_fen(self):
         return self.board.fen()
 
+    def move(self, uci):
+        self.board.push_uci(uci)
+
     def random_move(self):
         legal_moves = self.get_legal_moves()
         random_int = random.randint(0,len(legal_moves)-1)
@@ -50,7 +53,7 @@ class Minmax(object):
 
     def calculate_best_move(self, fen = False, player = 'white'):
         if not fen:
-            fen = self.get_fen()
+            fen = self.board.fen()
 
         if player == 'white':
             score = 9999
@@ -59,6 +62,19 @@ class Minmax(object):
             board = self.board.copy()
             board.push_uci(move)
             new_score = self.calculate_score(board.fen())
+            if new_score < score:
+                score = new_score
+                best_move = move
+
+        return best_move
+
+    def calculate_best_minimax_move(self, depth = 3):
+        score = 9999
+        best_move = self.get_legal_moves()[0]
+        for move in self.get_legal_moves()[1:]:
+            board = self.board.copy()
+            board.push_uci(move)
+            new_score = self.minimax(depth, board)
             if new_score < score:
                 score = new_score
                 best_move = move
@@ -78,7 +94,30 @@ class Minmax(object):
 
         return score
 
-    def move(self, uci):
-        self.board.push_uci(uci)
+    def minimax(self, depth, board, alpha = -9999, beta = 9999, is_max_player = 'False'):
+        if depth == 0:
+            return self.calculate_score(board.fen())
+
+        game_moves = board.legal_moves
+        if (is_max_player):
+            score = -9999
+            for move in game_moves:
+                new_board = board.copy()
+                new_board.push_uci(move.uci())
+                score = max(score, self.minimax(depth - 1, new_board, alpha, beta, not is_max_player))
+                alpha = max(alpha, score)
+                if beta <= alpha:
+                    return score
+            return score
+        else:
+            score = 9999
+            for move in game_moves:
+                new_board = board.copy()
+                new_board.push_uci(move.uci())
+                score = min(score, self.minimax(depth - 1, new_board, alpha, beta, not is_max_player))
+                beta = min(beta, score)
+                if beta <= alpha:
+                    return score
+            return score
 
 

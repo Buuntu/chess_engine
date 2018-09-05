@@ -37,16 +37,19 @@
                 
                 if (moveColor === 'Black') {
                     console.log(game.fen());
+                    board.draggable = false
                     $.ajax({
                         type: "POST",
-                        async: false,
-                        url: "/best_random_move",
+                        async: true,
+                        url: "/best_minimax_move",
                         contentType: "application/json",
                         data: JSON.stringify({
                             board: game.fen()
                         }), 
                         success: function(data) {
                             game = new Chess(data.board);
+                            board.draggable = true;
+                            board.position(game.fen())
                             console.log(data);
                         },
                         dataType: "json"
@@ -93,6 +96,9 @@
             };
 
             var onSnapEnd = function() {
+                if(game.turn() == 'b') {
+                    
+                }
                 board.position(game.fen());
             }
 

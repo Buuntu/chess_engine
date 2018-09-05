@@ -36,5 +36,15 @@ def best_random_move():
 
     return jsonify({'board': str(board.get_fen())})
 
+@app.route('/best_minimax_move', methods = ['POST'])
+def best_minimax_move():
+    json_post = request.get_json(force = True)
+    if ("board" in json_post):
+        board = engine.Minmax(json_post['board'])
+        uci_move = board.calculate_best_minimax_move(2)
+        board.move(uci_move)
+
+    return jsonify({'board': str(board.get_fen())})
+
 if __name__ == '__main__':
     app.run(debug=True)

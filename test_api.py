@@ -43,6 +43,12 @@ def test_best_random_move_api(client):
     assert json_response['board'] == 'rnbqkbnr/ppp1pppp/8/8/3Pp3/8/PPP2PPP/RNBQKBNR w KQkq - 0 2'
     assert response.status_code == 200
 
+def test_best_minimax_move_api(client):
+    response = post_json(client, '/best_minimax_move', {'board': 'rnbqkbnr/ppp1pppp/8/3p4/3PP3/8/PPP2PPP/RNBQKBNR b KQkq - 0 1'})
+    json_response = json_of_response(response)
+    assert json_response['board'] == 'rnbqkbnr/ppp1pppp/8/8/3Pp3/8/PPP2PPP/RNBQKBNR w KQkq - 0 2'
+    assert response.status_code == 200
+
 def test_score(client):
     minmax = engine.Minmax()
     assert minmax.calculate_score() == 0
